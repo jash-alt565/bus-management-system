@@ -58,3 +58,67 @@ def index():
         frequency_data=frequency_data_json,
         route_data=route_data_json
     )
+
+
+# ... EXISTING ROUTES REMAIN UNCHANGED ...
+
+def get_bus_number(bus):
+    """Helper to get bus identifier - handles both bus_number and registration_number"""
+    return getattr(bus, 'bus_number', None) or getattr(bus, 'registration_number', f'Bus-{bus.id}')
+
+
+@dashboard_bp.route('/operator')
+def operator_dashboard():
+    """Operator dashboard with live tracking"""
+    active_buses = Bus.query.filter_by(is_active=True).all()
+    total_buses = Bus.query.count()
+
+    return render_template('dashboard/operator_dashboard.html',
+                         active_buses=active_buses,
+                         total_buses=total_buses)
+
+
+@dashboard_bp.route('/user')
+def user_dashboard():
+    """User dashboard for bus tracking"""
+    routes = Route.query.all()
+    return render_template('dashboard/user_dashboard.html', routes=routes)
+
+
+@dashboard_bp.route('/live-demo')
+def live_demo():
+    """Live demo with simulation"""
+    # Activate first 5 buses for demo
+    buses = Bus.query.limit(5).all()
+    for bus in buses:
+        bus.is_active = True
+    db.session.commit()
+
+    return render_template('dashboard/live_demo.html', demo_buses=buses)
+
+
+@dashboard_bp.route('/api/buses/active')
+def get_active_buses():
+    """API: Get all active buses"""
+    buses = Bus.query.filter_by(is_active=True).all()
+    return jsonify([{
+        'id': bus.id,
+        'bus_number': get_bus_number(bus),
+        'lat': bus.location_lat or 18.5204,
+        'lng': bus.location_lng or 73.8567,
+        'speed': bus.current_speed or 0
+    } for bus in buses])
+
+
+@dashboard_bp.route('/api/bus/<int:bus_id>')
+def get_bus_details(bus_id):
+    """API: Get single bus details"""
+    bus = Bus.query.get_or_404(bus_id)
+    return jsonify({
+        'id': bus.id,
+        'bus_number': get_bus_number(bus),
+        'lat': bus.location_lat or 18.5204,
+        'lng': bus.location_lng or 73.8567,
+        'speed': bus.current_speed or 0,
+        'is_active': bus.is_active
+    })
