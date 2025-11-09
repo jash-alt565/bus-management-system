@@ -5,6 +5,15 @@ from app.models import db
 
 csrf = CSRFProtect()
 
+# Conditional Socket.IO import
+try:
+    from flask_socketio import SocketIO
+    socketio = SocketIO()
+    SOCKETIO_ENABLED = True
+except ImportError:
+    socketio = None
+    SOCKETIO_ENABLED = False
+
 def create_app(config_class=Config):
     """Flask application factory"""
     app = Flask(__name__)
