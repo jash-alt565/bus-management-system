@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Operator Dashboard{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #map { height: 500px; border-radius: 8px; }
+    .stats-card { transition: transform 0.2s; }
+    .stats-card:hover { transform: translateY(-5px); }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2><i class="bi bi-broadcast"></i> Live Operator Dashboard</h2>
+
+    <div class="row my-4">
+        <div class="col-md-4">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <h3 class="text-primary">{{ active_buses|length }}</h3>
+                    <p>Active Buses</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <h3 class="text-success">{{ total_buses }}</h3>
+                    <p>Total Fleet</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card stats-card">
+                <div class="card-body text-center">
+                    <h3 id="connection-status" class="text-muted">Connecting...</h3>
+                    <p>Socket.IO Status</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">Live Fleet Map</div>
+        <div class="card-body p-0">
+            <div id="map"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+    const map = L.map('map').setView([18.5204, 73.8567], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    const busMarkers = {};
+
+    // Try to connect Socket.IO
+    try {
+        const socket = io();
+
+        socket.on('connect', () => {
+            document.getElementById('connection-status').textContent = 'Connected';
+            document.getElementById('connection-status').className = 'text-success';
+            socket.emit('join_operator');
+        });
+
+        socket.on('bus_update', (data) => {
+            if (busMarkers[data.bus_id]) {
+                busMarkers[data.bus_id].setLatLng([data.lat, data.lng]);
+            } else {
+                busMarkers[data.bus_id] = L.circleMarker([data.lat, data.lng], {
+                    radius: 8,
+                    fillColor: '#007bff',
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.8
+                }).addTo(map).bindPopup(`<b>${data.bus_number}</b><br>Speed: ${data.speed.toFixed(1)} km/h`);
+            }
+        });
+
+        socket.on('disconnect', () => {
+            document.getElementById('connection-status').textContent = 'Disconnected';
+            document.getElementById('connection-status').className = 'text-danger';
+        });
+    } catch(e) {
+        document.getElementById('connection-status').textContent = 'Offline Mode';
+        document.getElementById('connection-status').className = 'text-warning';
+        console.log('Socket.IO not available, using polling fallback');
+
+        // Fallback: Poll API every 5 seconds
+        setInterval(() => {
+            fetch('/dashboard/api/buses/active')
+                .then(r => r.json())
+                .then(buses => {
+                    buses.forEach(bus => {
+                        if (busMarkers[bus.id]) {
+                            busMarkers[bus.id].setLatLng([bus.lat, bus.lng]);
+                        } else {
+                            busMarkers[bus.id] = L.circleMarker([bus.lat, bus.lng], {
+                                radius: 8,
+                                fillColor: '#007bff',
+                                color: '#fff',
+                                weight: 2,
+                                fillOpacity: 0.8
+                            }).addTo(map).bindPopup(`<b>${bus.bus_number}</b>`);
+                        }
+                    });
+                });
+        }, 5000);
+    }
+
+    // Load initial positions
+    fetch('/dashboard/api/buses/active')
+        .then(r => r.json())
+        .then(buses => {
+            buses.forEach(bus => {
+                busMarkers[bus.id] = L.circleMarker([bus.lat, bus.lng], {
+                    radius: 8,
+                    fillColor: '#007bff',
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.8
+                }).addTo(map).bindPopup(`<b>${bus.bus_number}</b>`);
+            });
+        });
+</script>
+{% endblock %}
