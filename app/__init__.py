@@ -65,6 +65,23 @@ def create_app(config_class=Config):
     elif skip_background:
         print("⚠️ Background tasks skipped (migration mode)")
 
+    # Language switching route
+    @app.route('/set-language/<lang>')
+    def set_language(lang):
+        """Set user's language preference"""
+        if lang in ['en', 'mr']:
+            session['lang'] = lang
+        return redirect(request.referrer or url_for('home.index'))
+
+    # Context processor for translations
+    @app.context_processor
+    def inject_translations():
+        """Make translation function available in all templates"""
+        lang = session.get('lang', 'en')
+        def t(key):
+            return get_translation(key, lang)
+        return dict(t=t, current_lang=lang)
+
     # Error handlers
     @app.errorhandler(404)
     def not_found_error(error):
