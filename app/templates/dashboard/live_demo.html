@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Live Demo{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<style>
+    #demo-map { height: 600px; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <h2><i class="bi bi-play-circle"></i> Live Demo - Real-Time Tracking</h2>
+    <div class="card mt-3">
+        <div class="card-body p-0">
+            <div id="demo-map"></div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+    const map = L.map('demo-map').setView([18.5204, 73.8567], 12);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
+
+    const busMarkers = {};
+
+    try {
+        const socket = io();
+        socket.on('connect', () => socket.emit('join_operator'));
+        socket.on('bus_update', (data) => {
+            if (busMarkers[data.bus_id]) {
+                busMarkers[data.bus_id].setLatLng([data.lat, data.lng]);
+            } else {
+                busMarkers[data.bus_id] = L.circleMarker([data.lat, data.lng], {
+                    radius: 10,
+                    fillColor: '#28a745',
+                    color: '#fff',
+                    weight: 2,
+                    fillOpacity: 0.9
+                }).addTo(map).bindPopup(`<b>${data.bus_number}</b><br>Speed: ${data.speed.toFixed(1)} km/h`);
+            }
+        });
+    } catch(e) {
+        setInterval(() => {
+            fetch('/dashboard/api/buses/active')
+                .then(r => r.json())
+                .then(buses => buses.forEach(bus => {
+                    if (busMarkers[bus.id]) {
+                        busMarkers[bus.id].setLatLng([bus.lat, bus.lng]);
+                    } else {
+                        busMarkers[bus.id] = L.circleMarker([bus.lat, bus.lng], {
+                            radius: 10,
+                            fillColor: '#28a745',
+                            color: '#fff',
+                            weight: 2,
+                            fillOpacity: 0.9
+                        }).addTo(map).bindPopup(`<b>${bus.bus_number}</b>`);
+                    }
+                }));
+        }, 3000);
+    }
+</script>
+{% endblock %}
