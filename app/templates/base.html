@@ -71,8 +71,18 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint and request.endpoint.startswith('reports') %}active{% endif %}" href="{{ url_for('reports.index') }}">
-                            <span class="color-indicator" style="background-color: #6f42c1;"></span> Reports
+                            <span class="color-indicator" style="background-color: #6f42c1;"></span> {{ t('reports') }}
                         </a>
+                    </li>
+                    <li class="nav-item ms-3">
+                        <div class="btn-group" role="group">
+                            <a href="{{ url_for('set_language', lang='en') }}" class="btn btn-sm {% if current_lang == 'en' %}btn-primary{% else %}btn-outline-light{% endif %}">
+                                EN
+                            </a>
+                            <a href="{{ url_for('set_language', lang='mr') }}" class="btn btn-sm {% if current_lang == 'mr' %}btn-primary{% else %}btn-outline-light{% endif %}">
+                                मराठी
+                            </a>
+                        </div>
                     </li>
                 </ul>
             </div>
