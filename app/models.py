@@ -14,6 +14,13 @@ class Bus(db.Model):
     status = db.Column(db.String(20), nullable=False, default='active')  # active, inactive, maintenance
     purchase_date = db.Column(db.Date, nullable=True)
 
+    # GPS Tracking columns (added for real-time tracking)
+    location_lat = db.Column(db.Float, nullable=True, default=18.5204)
+    location_lng = db.Column(db.Float, nullable=True, default=73.8567)
+    last_location_update = db.Column(db.DateTime, nullable=True)
+    current_speed = db.Column(db.Float, nullable=True, default=0.0)
+    is_active = db.Column(db.Boolean, nullable=True, default=False)
+
     # Relationships
     schedules = db.relationship('Schedule', backref='bus', lazy=True, cascade='all, delete-orphan')
 
