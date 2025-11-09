@@ -24,4 +24,11 @@ if __name__ == '__main__':
     print("Press CTRL+C to quit")
     print("=" * 60)
 
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    if SOCKETIO_ENABLED:
+        # Import socketio AFTER app creation to avoid circular imports
+        from app import socketio
+        socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    else:
+        # Fallback to regular Flask
+        print("⚠️ Running without Socket.IO - install dependencies for full features")
+        app.run(debug=True, host='0.0.0.0', port=5000)
