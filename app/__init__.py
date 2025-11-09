@@ -23,6 +23,18 @@ def create_app(config_class=Config):
     db.init_app(app)
     csrf.init_app(app)
 
+    # Only initialize Socket.IO if available
+    # FIXED: Use threading mode for SQLite compatibility
+    if SOCKETIO_ENABLED:
+        socketio.init_app(app,
+                         cors_allowed_origins="*",
+                         async_mode='threading',
+                         logger=False,
+                         engineio_logger=False)
+        print("✅ Socket.IO initialized (threading mode)")
+    else:
+        print("⚠️ Socket.IO not available - real-time features disabled")
+
     # Register blueprints
     from app.blueprints.home import home_bp
     from app.blueprints.buses import buses_bp
