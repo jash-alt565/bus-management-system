@@ -1,4 +1,4 @@
-from flask import render_template
+from flask import render_template, jsonify
 from app.blueprints.dashboard import dashboard_bp
 from app.models import Bus, Route, Schedule, Crew, db
 from sqlalchemy import func
