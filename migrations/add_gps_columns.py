@@ -24,6 +24,13 @@ def safe_add_column(table, column, column_type, default=None):
 
 with app.app_context():
     try:
+        # First, create all tables if they don't exist
+        print("Creating database tables if they don't exist...")
+        db.create_all()
+        print("✅ Database tables ready\n")
+
+        # Now add GPS columns
+        print("Adding GPS tracking columns...")
         safe_add_column('buses', 'location_lat', 'REAL', '18.5204')
         safe_add_column('buses', 'location_lng', 'REAL', '73.8567')
         safe_add_column('buses', 'last_location_update', 'DATETIME')
