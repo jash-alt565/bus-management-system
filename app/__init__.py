@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template
 from flask_wtf.csrf import CSRFProtect
 from config import Config
