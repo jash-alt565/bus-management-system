@@ -3,7 +3,8 @@ Bus Depot Management System
 Application entry point
 """
 
-from app import create_app
+# FIXED: Import create_app first, then conditionally import socketio
+from app import create_app, SOCKETIO_ENABLED
 from app.models import db
 
 # Create Flask application instance
