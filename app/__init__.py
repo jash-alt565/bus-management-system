@@ -53,13 +53,16 @@ def create_app(config_class=Config):
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     app.register_blueprint(reports_bp, url_prefix='/reports')
 
-    # Start background tasks if Socket.IO available
-    if SOCKETIO_ENABLED:
+    # Start background tasks if Socket.IO available and not skipped
+    skip_background = os.environ.get('SKIP_BACKGROUND_TASKS', '0') == '1'
+    if SOCKETIO_ENABLED and not skip_background:
         from app.blueprints.dashboard import background_tasks
         background_tasks.start_background_updates(app)
 
         # Import socket_events to register event handlers
         from app.blueprints.dashboard import socket_events
+    elif skip_background:
+        print("⚠️ Background tasks skipped (migration mode)")
 
     # Error handlers
     @app.errorhandler(404)
