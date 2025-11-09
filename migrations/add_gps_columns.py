@@ -2,6 +2,9 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
+# Disable background tasks during migration
+os.environ['SKIP_BACKGROUND_TASKS'] = '1'
+
 # FIXED: Use create_app() pattern
 from app import create_app
 from app.models import db
