@@ -34,39 +34,39 @@
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint and request.endpoint.startswith('home') %}active{% endif %}" href="{{ url_for('home.index') }}">
-                            Home
+                            {{ t('home') }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint and request.endpoint.startswith('buses') %}active{% endif %}" href="{{ url_for('buses.list_buses') }}">
-                            <span class="color-indicator" style="background-color: #28a745;"></span> Buses
+                            <span class="color-indicator" style="background-color: #28a745;"></span> {{ t('buses') }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint and request.endpoint.startswith('routes') %}active{% endif %}" href="{{ url_for('routes.list_routes') }}">
-                            <span class="color-indicator" style="background-color: #ffc107;"></span> Routes
+                            <span class="color-indicator" style="background-color: #ffc107;"></span> {{ t('routes') }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint and request.endpoint.startswith('schedules') %}active{% endif %}" href="{{ url_for('schedules.list_schedules') }}">
-                            <span class="color-indicator" style="background-color: #007bff;"></span> Schedules
+                            <span class="color-indicator" style="background-color: #007bff;"></span> {{ t('schedules') }}
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint and request.endpoint.startswith('crew') %}active{% endif %}" href="{{ url_for('crew.list_crew') }}">
-                            <span class="color-indicator" style="background-color: #fd7e14;"></span> Crew
+                            <span class="color-indicator" style="background-color: #fd7e14;"></span> {{ t('crew') }}
                         </a>
                     </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle {% if request.endpoint and request.endpoint.startswith('dashboard') %}active{% endif %}" href="#" id="dashboardDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            <span class="color-indicator" style="background-color: #20c997;"></span> Dashboard
+                            <span class="color-indicator" style="background-color: #20c997;"></span> {{ t('dashboard') }}
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="dashboardDropdown">
-                            <li><a class="dropdown-item" href="{{ url_for('dashboard.index') }}"><i class="bi bi-bar-chart"></i> Analytics</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard.index') }}"><i class="bi bi-bar-chart"></i> {{ t('analytics') }}</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ url_for('dashboard.operator_dashboard') }}"><i class="bi bi-broadcast"></i> Live Tracking (Operator)</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('dashboard.user_dashboard') }}"><i class="bi bi-geo-alt"></i> Track Your Bus (User)</a></li>
-                            <li><a class="dropdown-item" href="{{ url_for('dashboard.live_demo') }}"><i class="bi bi-play-circle"></i> Live Demo</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard.operator_dashboard') }}"><i class="bi bi-broadcast"></i> {{ t('live_tracking') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard.user_dashboard') }}"><i class="bi bi-geo-alt"></i> {{ t('track_bus') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard.live_demo') }}"><i class="bi bi-play-circle"></i> {{ t('live_demo') }}</a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
