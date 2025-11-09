@@ -54,10 +54,17 @@
                             <span class="color-indicator" style="background-color: #fd7e14;"></span> Crew
                         </a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint and request.endpoint.startswith('dashboard') %}active{% endif %}" href="{{ url_for('dashboard.index') }}">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {% if request.endpoint and request.endpoint.startswith('dashboard') %}active{% endif %}" href="#" id="dashboardDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                             <span class="color-indicator" style="background-color: #20c997;"></span> Dashboard
                         </a>
+                        <ul class="dropdown-menu" aria-labelledby="dashboardDropdown">
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard.index') }}"><i class="bi bi-bar-chart"></i> Analytics</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard.operator_dashboard') }}"><i class="bi bi-broadcast"></i> Live Tracking (Operator)</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard.user_dashboard') }}"><i class="bi bi-geo-alt"></i> Track Your Bus (User)</a></li>
+                            <li><a class="dropdown-item" href="{{ url_for('dashboard.live_demo') }}"><i class="bi bi-play-circle"></i> Live Demo</a></li>
+                        </ul>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint and request.endpoint.startswith('reports') %}active{% endif %}" href="{{ url_for('reports.index') }}">
