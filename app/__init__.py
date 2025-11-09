@@ -52,6 +52,14 @@ def create_app(config_class=Config):
     app.register_blueprint(dashboard_bp, url_prefix='/dashboard')
     app.register_blueprint(reports_bp, url_prefix='/reports')
 
+    # Start background tasks if Socket.IO available
+    if SOCKETIO_ENABLED:
+        from app.blueprints.dashboard import background_tasks
+        background_tasks.start_background_updates(app)
+
+        # Import socket_events to register event handlers
+        from app.blueprints.dashboard import socket_events
+
     # Error handlers
     @app.errorhandler(404)
     def not_found_error(error):
